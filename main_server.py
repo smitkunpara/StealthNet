@@ -3,7 +3,7 @@ import threading,time
 
 active_bakare={}
 active_sher=[]
-IP="localhost"
+IP="10.1.185.174"
 PORT=4444
 
 def reliable_send(data,connection):

