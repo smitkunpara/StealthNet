@@ -1,5 +1,4 @@
 import socket,json,base64
-import time
 import pandas as pd
 import datetime
 import ssl

