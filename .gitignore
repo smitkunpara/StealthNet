@@ -2,4 +2,4 @@
 /dist
 /.cph
 /__pycache__
-/extra.__pycache__
+/extra*

