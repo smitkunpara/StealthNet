@@ -129,24 +129,24 @@ class browser:
                 return "[-][ERR] %s"%str(e)
         return cookies
 
-import pandas as pd
-def create_password_csv():
-    browser_obj = browser()
-    passwords = browser_obj.GetPasswords()
-    if type(passwords) == str:
-        return passwords
-    df = pd.DataFrame(passwords, columns=["Browser", "URL", "Username", "Password"])
-    df.to_csv("passwords.csv", index=False)
-    return "Password file created successfully"
+# import pandas as pd
+# def create_password_csv():
+#     browser_obj = browser()
+#     passwords = browser_obj.GetPasswords()
+#     if type(passwords) == str:
+#         return passwords
+#     df = pd.DataFrame(passwords, columns=["Browser", "URL", "Username", "Password"])
+#     df.to_csv("passwords.csv", index=False)
+#     return "Password file created successfully"
 
-def create_cookies_csv():
-    browser_obj = browser()
-    cookies = browser_obj.GetCookies()
-    if type(cookies) == str:
-        return cookies
-    df = pd.DataFrame(cookies, columns=["Browser", "Host Key", "Name", "Value", "Creation UTC", "Last Access UTC", "Expires UTC"])
-    df.to_csv("cookies.csv", index=False)
-    return "Cookies file created successfully"
+# def create_cookies_csv():
+#     browser_obj = browser()
+#     cookies = browser_obj.GetCookies()
+#     if type(cookies) == str:
+#         return cookies
+#     df = pd.DataFrame(cookies, columns=["Browser", "Host Key", "Name", "Value", "Creation UTC", "Last Access UTC", "Expires UTC"])
+#     df.to_csv("cookies.csv", index=False)
+#     return "Cookies file created successfully"
 
-print(create_password_csv())
-print(create_cookies_csv())
+# print(create_password_csv())
+# print(create_cookies_csv())

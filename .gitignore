@@ -3,3 +3,13 @@
 /.cph
 /__pycache__
 /extra*
+*.pem
+/.vscode
+*.spec
+.rnd
+send.py
+receive.py
+/extra
+ca.*
+Downloads
+/.vs

