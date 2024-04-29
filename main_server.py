@@ -4,6 +4,7 @@ import ssl
 active_bakare={}
 active_sher=[]
 IP=socket.gethostbyname(socket.gethostname())
+print(IP)
 PORT=8080
 
 def reliable_send(data,connection):
@@ -20,32 +21,32 @@ def reliable_receive(connection):
         except ValueError:
             continue
 
-def handle_sher_bakara(sher_socket):
-    while True:
-        try:
-            while len(active_bakare)==0:
-                reliable_send("[-] Bakara Disconnected",sher_socket)
-                active_bakare.pop(n)
-                handle_sher(sher_socket)
-            command=reliable_receive(sher_socket)
-            if command[0]=="change_bakara":
-                reliable_send(list(active_bakare.keys()),sher_socket)
-                n=reliable_receive(sher_socket)
-                continue
-            reliable_send(command,active_bakare[n])
-            reliable_send(reliable_receive(active_bakare[n]),sher_socket)
-        except ConnectionResetError or ssl.SSLEOFError:
-            try:
-                reliable_send("[-] Bakara disconnected",sher_socket)
-                active_bakare.pop(n)
-            except:
-                active_sher.remove(sher_socket)
-                sher_socket.close()
-                break
-        except Exception as e:
-            reliable_send('[-] Main Server ERR : \n%s'%str(e),sher_socket)
-            sher_socket.close()
-            break
+# def handle_sher_bakara(sher_socket):
+#     while True:
+#         try:
+#             while len(active_bakare)==0:
+#                 reliable_send("[-] Bakara Disconnected",sher_socket)
+#                 active_bakare.pop(n)
+#                 handle_sher(sher_socket)
+#             command=reliable_receive(sher_socket)
+#             if command[0]=="change_bakara":
+#                 reliable_send(list(active_bakare.keys()),sher_socket)
+#                 n=reliable_receive(sher_socket)
+#                 continue
+#             reliable_send(command,active_bakare[n])
+#             reliable_send(reliable_receive(active_bakare[n]),sher_socket)
+#         except ConnectionResetError or ssl.SSLEOFError:
+#             try:
+#                 reliable_send("[-] Bakara disconnected",sher_socket)
+#                 active_bakare.pop(n)
+#             except:
+#                 active_sher.remove(sher_socket)
+#                 sher_socket.close()
+#                 break
+#         except Exception as e:
+#             reliable_send('[-] Main Server ERR : \n%s'%str(e),sher_socket)
+#             sher_socket.close()
+#             break
 
 def handle_sher(sher_socket):
     while True:
@@ -55,6 +56,34 @@ def handle_sher(sher_socket):
         bakare=list(active_bakare.keys())
         reliable_send(bakare,sher_socket)
         n=reliable_receive(sher_socket)
+        while True:
+            try:
+                while len(active_bakare)==0:
+                    reliable_send("[-] Bakara Disconnected",sher_socket)
+                    active_bakare.pop(n)
+                    handle_sher(sher_socket)
+                command=reliable_receive(sher_socket)
+                if command[0]=="change_bakara":
+                    reliable_send(list(active_bakare.keys()),sher_socket)
+                    n=reliable_receive(sher_socket)
+                    continue
+                reliable_send(command,active_bakare[n])
+                reliable_send(reliable_receive(active_bakare[n]),sher_socket)
+            except ConnectionResetError:
+                try:
+                    reliable_send("[-] Bakara disconnected",sher_socket)
+                    active_bakare.pop(n)
+                except:
+                    active_sher.remove(sher_socket)
+                    sher_socket.close()
+                    break
+            except Exception as e:
+                reliable_send('[-] Main Server ERR : \n%s'%str(e),sher_socket)
+                sher_socket.close()
+                break
+
+                
+        
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.minimum_version = ssl.TLSVersion.TLSv1_2

