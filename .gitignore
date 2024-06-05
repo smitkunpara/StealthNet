@@ -13,3 +13,4 @@ receive.py
 ca.*
 Downloads
 /.vs
+*.csv
