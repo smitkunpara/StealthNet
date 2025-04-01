@@ -6,7 +6,7 @@ import ssl
 class Listener:
     def __init__(self,ip,port):
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        self.context.load_verify_locations("ca.crt")
+        self.context.load_verify_locations("keys/ca.crt")
         self.context.check_hostname = False
         self.context.verify_mode = ssl.CERT_NONE
         self.connection=socket.socket(socket.AF_INET,socket.SOCK_STREAM)

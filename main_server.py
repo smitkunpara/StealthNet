@@ -60,7 +60,7 @@ def handle_sher(sher_socket):
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.minimum_version = ssl.TLSVersion.TLSv1_2
 context.maximum_version = ssl.TLSVersion.TLSv1_3
-context.load_cert_chain(certfile="ca.crt", keyfile="ca.key")
+context.load_cert_chain(certfile="keys/ca.crt", keyfile="keys/ca.key")
 listener=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 listener.bind((IP,PORT))
